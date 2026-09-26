@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from posthorn.core import (
-    AlertCarrier,
     Campaign,
     JobPost,
 )
 
 
-class Telegram(AlertCarrier):
+class Discord:
 
     def __init__(self, token: str, chat_id: str):
         self._token = token
@@ -15,7 +14,7 @@ class Telegram(AlertCarrier):
 
     @property
     def name(self) -> str:
-        return "telegram-alert-carrier"
+        return "discord-alert-carrier"
 
     async def dispatch(self, job: JobPost, campaign: Campaign) -> None:
         pass

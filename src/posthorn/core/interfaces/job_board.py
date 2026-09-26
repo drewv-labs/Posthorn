@@ -14,6 +14,6 @@ class JobBoard(Protocol):
         """Returns the name of the job board adapter."""
         ...
 
-    async def poll(self, campaign: Campaign) -> AsyncGenerator[JobPost, None]:
+    async def poll(self, campaign: Campaign) -> AsyncGenerator[JobPost]:
         """Yields normalized job posts matching the campaign parameters."""
         ...

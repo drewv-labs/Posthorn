@@ -1,0 +1,167 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Build System
+# ──────────────────────────────────────────────────────────────────────────────
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Project Metadata
+# ──────────────────────────────────────────────────────────────────────────────
+[project]
+name = "posthorn"
+version = "0.1.0"
+description = "Lightweight configurable job posting scanner and alerting. Work smarter, not harder"
+readme = "README.md"
+authors = [
+    {name = "Drew Vandagriff", email = "vandagriff.drew@gmail.com"},
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: Pytest",
+]
+requires-python = ">=3.11"
+
+# ── Runtime Dependencies ──────────────────────────────────────────────────────
+dependencies = [
+    "bs4",
+    "httpx",
+
+]
+
+# ── Optional / Extra Dependencies ─────────────────────────────────────────────
+[project.optional-dependencies]
+test = [
+    "pytest>=9.1.0",
+    "pytest-cov>=7.1.0",
+    "pytest-mock>=3.15.0",
+    "responses>=0.26.0",
+    "respx>=0.23.0",
+    "freezegun>=1.5.0",
+]
+dev = [
+    "ruff>=0.16.0",
+    "mypy>=2.3.0",
+    "types-requests>=2.33.0.20260906",
+    "pre-commit>=4.6.0",
+    "build>=1.6.0",
+    "twine>=7.0.0",
+    "ipython>=9.17.0",
+    "pandas>=3.0.0",
+]
+duckdb = [
+    "duckdb>=0.10.0",
+]
+postgresql = [
+    "psycopg2>=2.9.0",
+]
+
+# ── Entry Points (CLI) ───────────────────────────────────────────────────────
+# Uncomment when you have a CLI:
+# [project.scripts]
+# sharedk = "sharedk.cli:main"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Package Configuration
+# ──────────────────────────────────────────────────────────────────────────────
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["posthorn*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"posthorn" = ["**/*.json", "**/*.yaml", "**/*.yml", "**/*.toml"]
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Pytest Configuration
+# ──────────────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--tb=short",
+    "-v",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "duckdb: marks tests that require DuckDB connectivity",
+    "postgres: marks tests that require PostgreSQL connectivity",
+    "leap_year: marks tests for leap year boundary conditions",
+    "dst_transition: marks tests for DST transition edge cases",
+]
+filterwarnings = [
+    "error::DeprecationWarning",
+    "error::PendingDeprecationWarning",
+    "ignore::UserWarning",
+]
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Ruff — Linter & Formatter
+# ──────────────────────────────────────────────────────────────────────────────
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # isort
+    "W",    # pycodestyle warnings
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "C4",   # flake8-comprehensions
+]
+ignore = [
+    "E501", # line length is handled by formatter
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["posthorn"]
+
+# ──────────────────────────────────────────────────────────────────────────────
+# MyPy — Static Type Checking
+# ──────────────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Coverage
+# ──────────────────────────────────────────────────────────────────────────────
+[tool.coverage.run]
+source = ["src/sharedk"]
+omit = [
+    "tests/*",
+    "*/tests/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+fail_under = 0  # bump as tests mature (e.g. 80)
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Virtual Environment — use uv's lockfile
+# ──────────────────────────────────────────────────────────────────────────────
+# This project uses `uv` for dependency management.
+# Get started: uv sync --all-extras
