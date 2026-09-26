@@ -29,7 +29,6 @@ requires-python = ">=3.11"
 dependencies = [
     "bs4",
     "httpx",
-
 ]
 
 # ── Optional / Extra Dependencies ─────────────────────────────────────────────
@@ -45,24 +44,17 @@ test = [
 dev = [
     "ruff>=0.16.0",
     "mypy>=2.3.0",
-    "types-requests>=2.33.0.20260906",
     "pre-commit>=4.6.0",
     "build>=1.6.0",
     "twine>=7.0.0",
     "ipython>=9.17.0",
-    "pandas>=3.0.0",
 ]
 duckdb = [
     "duckdb>=0.10.0",
 ]
 postgresql = [
-    "psycopg2>=2.9.0",
+    "psycopg2-binary>=2.9.0",
 ]
-
-# ── Entry Points (CLI) ───────────────────────────────────────────────────────
-# Uncomment when you have a CLI:
-# [project.scripts]
-# sharedk = "sharedk.cli:main"
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Package Configuration
@@ -106,7 +98,7 @@ filterwarnings = [
 # Ruff — Linter & Formatter
 # ──────────────────────────────────────────────────────────────────────────────
 [tool.ruff]
-target-version = "py313"
+target-version = "py311"
 line-length = 100
 
 [tool.ruff.lint]
@@ -146,7 +138,7 @@ ignore_missing_imports = true
 # Coverage
 # ──────────────────────────────────────────────────────────────────────────────
 [tool.coverage.run]
-source = ["src/sharedk"]
+source = ["src/posthorn"]
 omit = [
     "tests/*",
     "*/tests/*",

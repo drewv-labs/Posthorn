@@ -10,12 +10,17 @@ def to_datetime(d: str | date | datetime) -> datetime:
     """
     if isinstance(d, datetime):
         # Ensure timezone awareness. If naive, assume local system time.
-        return d if d.tzinfo else d.astimezone()
+        if d.tzinfo:
+            return d
+        return d.replace(tzinfo=datetime.now().astimezone().tzinfo)
     if isinstance(d, date):
         # Convert date to midnight, then make it local timezone-aware.
-        return datetime.combine(d, datetime.min.time()).astimezone()
+        dt = datetime.combine(d, datetime.min.time())
+        return dt.replace(tzinfo=datetime.now().astimezone().tzinfo)
     if isinstance(d, str):
         dt = datetime.fromisoformat(d.replace("Z", "+00:00"))
-        return dt if dt.tzinfo else dt.astimezone()
+        if dt.tzinfo:
+            return dt
+        return dt.replace(tzinfo=datetime.now().astimezone().tzinfo)
 
     raise TypeError(f"Expected str, date, or datetime; got {type(d).__name__}")
