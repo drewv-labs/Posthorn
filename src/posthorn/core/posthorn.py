@@ -30,8 +30,8 @@ class Posthorn:
         await self.state_db.connect()
 
         try:
-            for campaign in self.campaigns:  # Assuming synchronous iterable yielding campaigns
-                for job_board in self.job_boards:  # Assuming synchronous iterable yielding boards
+            for campaign in self.campaigns:
+                for job_board in self.job_boards:
                     try:
                         # poll() returns an AsyncGenerator[JobPost, None]
                         async for job in job_board.poll(campaign):

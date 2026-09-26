@@ -82,63 +82,65 @@ class PostgresDB:
 
         now = current_local_datetime()
 
-        async with self._pool.acquire() as conn:
-            # Open an explicit transaction block
-            async with conn.transaction():
+        async with self._pool.acquire() as conn, conn.transaction():
+            current_state = await conn.fetchval(
+                "SELECT state FROM jobs WHERE id = $1 FOR UPDATE;",
+                job.id
+            )
 
-                # FOR UPDATE locks this specific row across all Postgres connections
-                # until this transaction commits or rolls back.
-                current_state = await conn.fetchval(
-                    "SELECT state FROM jobs WHERE id = $1 FOR UPDATE;",
-                    job.id
-                )
+            # FOR UPDATE locks this specific row across all Postgres connections
+            # until this transaction commits or rolls back.
+            current_state = await conn.fetchval(
+                "SELECT state FROM jobs WHERE id = $1 FOR UPDATE;",
+                job.id
+            )
 
-                # Lock check: Prevent duplicate alerts if already queued or sent
-                if ((new_state == JobState.ALERT_QUEUED) and
-                    (current_state in (str(JobState.ALERT_SENT), str(JobState.ALERT_QUEUED)))):
-                    return False
+            # Lock check: Prevent duplicate alerts if already queued or sent
+            if ((new_state == JobState.ALERT_QUEUED) and
+                (current_state in (str(JobState.ALERT_SENT), str(JobState.ALERT_QUEUED)))):
+                return False
 
-                if current_state is None:
-                    # First time seeing this job, record it
-                    published_dt = to_datetime(job.published_at) if job.published_at else None
-                    await conn.execute(
-                        """
-                        INSERT INTO jobs (
-                            id, title, company, url, board, published_at,
-                            state, campaign_name, error_msg, discovered_at, updated_at
-                        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
-                        """,
-                        job.id,
-                        job.title,
-                        job.company,
-                        job.url,
-                        job.board,
-                        published_dt,
-                        str(new_state),
-                        campaign.name,
-                        error_msg,
-                        now,
-                        now,
-                    )
-                    return True
-
-                # Existing record update
+            if current_state is None:
+                # First time seeing this job, record it
+                published_dt = to_datetime(job.published_at) if job.published_at else None
                 await conn.execute(
                     """
-                    UPDATE jobs
-                    SET state = $1,
-                        campaign_name = $2,
-                        error_msg = $3,
-                        updated_at = $4
-                    WHERE id = $5;
+                    INSERT INTO jobs (
+                        id, title, company, url, board, published_at,
+                        state, campaign_name, error_msg, discovered_at, updated_at
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
                     """,
+                    job.id,
+                    job.title,
+                    job.company,
+                    job.url,
+                    job.board,
+                    published_dt,
                     str(new_state),
                     campaign.name,
                     error_msg,
                     now,
-                    job.id,
+                    now,
                 )
                 return True
+
+            # Existing record update
+            await conn.execute(
+                """
+                UPDATE jobs
+                SET state = $1,
+                    campaign_name = $2,
+                    error_msg = $3,
+                    updated_at = $4
+                WHERE id = $5;
+                """,
+                str(new_state),
+                campaign.name,
+                error_msg,
+                now,
+                job.id,
+            )
+            return True
 
     async def get_campaign_metrics(self, campaign_name: str) -> dict[str, Any]:
         if not self._pool:

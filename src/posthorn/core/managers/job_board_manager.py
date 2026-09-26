@@ -84,8 +84,8 @@ class JobBoardManager:
             raise TypeError(f"Adapter {type(value).__name__} is missing the required 'name' property.")
 
         # Enforce that the dict key matches the board name to prevent split-brain bugs
-        if key != getattr(value, "name"):
-            raise ValueError(f"Key '{key}' must match the job board name '{getattr(value, 'name')}'")
+        if key != value.name:
+            raise ValueError(f"Key '{key}' must match the job board name '{value.name}'")
 
         self._job_boards[key] = value
 

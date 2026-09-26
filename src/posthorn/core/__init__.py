@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from .interfaces import (
         AlertCarrier,
         JobBoard,
+        StateDB,
     )
     from .managers import (
         CampaignManager,
@@ -14,6 +15,7 @@ if TYPE_CHECKING:
     from .models import (
         Campaign,
         JobPost,
+        JobState,
     )
     from .posthorn import Posthorn
 
@@ -24,5 +26,7 @@ __all__ = [
     "JobBoard",
     "JobBoardManager",
     "JobPost",
+    "JobState",
     "Posthorn",
+    "StateDB",
 ]

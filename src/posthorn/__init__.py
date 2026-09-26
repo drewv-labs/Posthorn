@@ -13,7 +13,6 @@ from .core import (
 )
 from .sugar import (
     current_local_datetime,
-    to_date,
     to_datetime,
 )
 
@@ -28,6 +27,5 @@ __all__ = [
     "JobState",
     "Posthorn",
     "current_local_datetime",
-    "to_date",
     "to_datetime",
 ]

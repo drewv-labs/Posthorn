@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import re
 import urllib.parse
 from collections.abc import AsyncGenerator
 
@@ -56,26 +57,28 @@ class ZipRecruiter:
 
                         for card in job_cards:
                             try:
-                                raw_id = card["data-job-id"]
+                                # Narrow type for data-job-id
+                                raw_id = card.get("data-job-id")
+                                if not isinstance(raw_id, str) or not raw_id:
+                                    continue
 
-                                # Title is usually inside an anchor tag with a specific 'job_link' class
-                                # or nested in an h2. We search broadly within the card.
-                                title_elem = card.find("h2") or card.find("a", class_=lambda c: c and "job_link" in c.lower())
+                                # Use compiled regex instead of lambdas for type-safe substring matching
+                                title_elem = card.find("h2") or card.find("a", class_=re.compile(r"job_link", re.IGNORECASE))
                                 title = title_elem.text.strip() if title_elem else "Unknown Title"
 
-                                # Company is often in an anchor with a 'company' class or a specific span
-                                company_elem = card.find(class_=lambda c: c and "company" in c.lower())
+                                # Pass `True` as the tag name when searching purely by class attributes
+                                company_elem = card.find(True, class_=re.compile(r"company", re.IGNORECASE))
                                 company = company_elem.text.strip() if company_elem else "Unknown Company"
 
-                                # Find the first anchor tag that actually links to the job
                                 link_elem = card.find("a", href=True)
                                 if not link_elem:
                                     continue
 
-                                raw_url = link_elem["href"]
+                                # Narrow type for href
+                                raw_url = link_elem.get("href")
+                                if not isinstance(raw_url, str) or not raw_url:
+                                    continue
 
-                                # Reconstruct clean URL. ZipRecruiter often uses relative paths or
-                                # heavily tracked redirect links. We strip query parameters to get the base route.
                                 if raw_url.startswith("/"):
                                     raw_url = f"https://www.ziprecruiter.com{raw_url}"
                                 clean_url = raw_url.split("?")[0]

@@ -54,9 +54,11 @@ class LinkedIn:
 
                         for card in job_cards:
                             try:
-                                # Extract the raw ID from the URN (e.g., urn:li:jobPosting:3849302 -> 3849302)
-                                urn = card.get("data-entity-urn", "")
-                                raw_id = urn.split(":")[-1] if urn else None
+                                # Narrow type for data-entity-urn
+                                urn = card.get("data-entity-urn")
+                                if not isinstance(urn, str) or not urn:
+                                    continue
+                                raw_id = urn.split(":")[-1]
 
                                 title_elem = card.find("h3", class_="base-search-card__title")
                                 company_elem = card.find("h4", class_="base-search-card__subtitle")
@@ -66,8 +68,11 @@ class LinkedIn:
                                 if not (raw_id and title_elem and company_elem and link_elem):
                                     continue
 
-                                # Clean tracking tags off the URL to prevent deduplication failures
-                                clean_url = link_elem.get("href", "").split("?")[0]
+                                # Narrow type for href to avoid the same split() error
+                                href = link_elem.get("href")
+                                if not isinstance(href, str) or not href:
+                                    continue
+                                clean_url = href.split("?")[0]
 
                                 yield JobPost(
                                     # Prefix ID with board name to prevent collisions with other job boards
