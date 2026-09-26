@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from datetime import UTC, date, datetime, timedelta, timezone
+from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
 
-from posthorn.sugar.to_datetime import to_datetime
+if TYPE_CHECKING:
+    from posthorn.sugar.to_datetime import to_datetime
 
 
 def test_to_datetime_aware_datetime():

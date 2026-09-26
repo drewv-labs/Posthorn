@@ -27,8 +27,8 @@ requires-python = ">=3.11"
 
 # ── Runtime Dependencies ──────────────────────────────────────────────────────
 dependencies = [
-    "bs4",
-    "httpx",
+    "beautifulsoup4>=4.15.0",
+    "httpx>=0.28.1",
 ]
 
 # ── Optional / Extra Dependencies ─────────────────────────────────────────────
@@ -54,6 +54,7 @@ duckdb = [
 ]
 postgresql = [
     "psycopg2-binary>=2.9.0",
+    "asyncpg>=0.31.0",
 ]
 
 # ──────────────────────────────────────────────────────────────────────────────

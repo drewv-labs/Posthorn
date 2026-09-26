@@ -1,3 +1,8 @@
+"""
+This represents a Posthorn implementation using:
+    LinkedIn job board
+    Telegram alert carrier
+"""
 from __future__ import annotations
 
 from posthorn import (
