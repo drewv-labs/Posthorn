@@ -2,20 +2,14 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from .models import (
-    AlertCarrierConfig,
+from ..models import (
     Campaign,
     JobPost,
 )
 
 
-class AlertCarrierAdapter(Protocol):
+class AlertCarrier(Protocol):
     """Structural type for outbound notification adapters."""
-
-    @classmethod
-    def from_config(cls, config: AlertCarrierConfig) -> AlertCarrierAdapter:
-        """Factory method to create a carrier from a configuration."""
-        ...
 
     @property
     def name(self) -> str:

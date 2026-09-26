@@ -1,18 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import asdict
-
-from .models import JobBoardManagerConfig
+from ..models import JobPost
 
 
 class JobBoardManager:
 
-    @classmethod
-    def from_config(cls, config: JobBoardManagerConfig) -> JobBoardManager:
-        return cls(**asdict(config))
-
-    def __init__(self, job_boards):
-        self.job_boards = job_boards
+    def __init__(self, job_boards: list[JobPost] | None = None):
+        self._job_boards = job_boards or []
 
     def __delitem__(self, index):
         del self.job_boards[index]

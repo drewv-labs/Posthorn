@@ -3,20 +3,11 @@ from __future__ import annotations
 from collections.abc import AsyncGenerator
 from typing import Protocol
 
-from .models import Campaign, JobPost
+from ..models import Campaign, JobPost
 
 
-class JobBoardConfig(Protocol):
-    """Type Linking"""
-
-
-class JobBoardAdapter(Protocol):
+class JobBoard(Protocol):
     """Structural type for inbound data sources."""
-
-    @classmethod
-    def from_config(cls, config: JobBoardConfig) -> JobBoardAdapter:
-        """Factory method to create a job board adapter from a configuration."""
-        ...
 
     @property
     def name(self) -> str:

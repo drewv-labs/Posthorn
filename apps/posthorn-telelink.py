@@ -1,35 +1,35 @@
 from __future__ import annotations
 
 from posthorn import (
+    Campaign,
     CampaignManager,
-    CampaignManagerConfig,
     JobBoardManager,
-    JobBoardManagerConfig,
     Posthorn,
-    PosthornConfig,
 )
 from posthorn.adapters import (
     LinkedIn,
-    LinkedInConfig,
     Telegram,
-    TelegramConfig,
 )
 
 
 def main():
-    posthorn = Posthorn.from_config(PosthornConfig(
-        alert_carrier=Telegram.from_config(TelegramConfig(
+    posthorn = Posthorn(
+        alert_carrier=Telegram(
             token="",
             chat_id="",
-        )),
-        job_boards=JobBoardManager.from_config(JobBoardManagerConfig(
-
-        )),
-        campaigns=CampaignManager.from_config(CampaignManagerConfig(
-            
-        )),
-    ))
-    posthorn.run()
+        ),
+        job_boards=JobBoardManager(
+            job_boards=[
+                LinkedIn(),
+            ]
+        ),
+        campaigns=CampaignManager(
+            campaigns=[
+                Campaign(),
+            ]
+        ),
+    )
+    posthorn.start()
 
 
 if __name__ == "__main__":

@@ -1,29 +1,25 @@
 from __future__ import annotations
 
-from .alert_carrier import AlertCarrierAdapter
-from .campaign_manager import CampaignManager
-from .job_board import JobBoardAdapter
-from .job_board_manager import JobBoardManager
-from .main import Posthorn
-from .models import (
-    AlertCarrierConfig,
-    Campaign,
-    CampaignManagerConfig,
-    JobBoardManagerConfig,
-    JobPost,
-    PosthornConfig,
+from .interfaces import (
+    AlertCarrier,
+    JobBoard,
 )
+from .managers import (
+    CampaignManager,
+    JobBoardManager,
+)
+from .models import (
+    Campaign,
+    JobPost,
+)
+from .posthorn import Posthorn
 
 __all__ = [
-    "AlertCarrierAdapter",
-    "AlertCarrierConfig",
+    "AlertCarrier",
     "Campaign",
     "CampaignManager",
-    "CampaignManagerConfig",
-    "JobBoardAdapter",
+    "JobBoard",
     "JobBoardManager",
-    "JobBoardManagerConfig",
     "JobPost",
     "Posthorn",
-    "PosthornConfig",
 ]
