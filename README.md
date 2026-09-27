@@ -7,7 +7,7 @@
 
 <br/>
 
-Posthorn is a lightweight, strictly-typed Python background service designed to poll job boards, filter for specific campaigns, and push early-warning alerts to webhooks or chat platforms. Built on modern Python concurrency, it relies on an embedded DuckDB state machine to enforce absolute idempotency—guaranteeing that a matched job is alerted on exactly once, even across overlapping sweeps or network failures.
+Posthorn is a lightweight, TUI supported background service designed to poll job boards, filter for specific campaigns, and push early-warning alerts to webhooks or chat platforms. Built on modern Python concurrency, it relies on an embedded DuckDB state machine to enforce absolute idempotency—guaranteeing that a matched job is alerted on exactly once, even across overlapping sweeps or network failures.
 
 ## ⚡ Core Philosophy
 
@@ -20,7 +20,7 @@ Posthorn is a lightweight, strictly-typed Python background service designed to 
 
 ## 🏗 Architecture
 
-Posthorn is built around three interchangeable layers orchestrated by the main `Posthorn` daemon loop:
+Posthorn is built around two interchangeable layers orchestrated by the main `PosthornDaemon` daemon loop:
 
 1. **Job Boards (`JobBoard` Protocol):** Inbound data adapters.
 * *Included:* `LinkedIn`, `Indeed`, `ZipRecruiter`.
@@ -30,92 +30,26 @@ Posthorn is built around three interchangeable layers orchestrated by the main `
 * *Included:* `Discord` (Rich Webhooks), `Telegram`.
 
 
-3. **State Database:** The idempotency lock and metrics tracker.
-* *Included:* `DuckDB`.
-
-
 
 ---
 
 ## 🚀 Quick Start
 
+Posthorn is a frictionless, terminal-native daemon. Because of its dynamic registry architecture, it requires zero Python scripting to configure and run.
+
 ### Installation
 
-Posthorn is designed to be deployed into modern, isolated Python environments. We recommend using Astral's `uv`:
+We recommend installing Posthorn globally as a standalone tool using Astral's `uv`:
 
 ```bash
-uv pip install posthorn
-
+uv tool install posthorn
 ```
 
-### Example Usage: The "Telelink" Daemon
+**Start the app** using `posthorn` command. 
 
-Wiring up an alerting daemon requires simply declaring your carriers, boards, and campaigns, then awaiting the `run()` loop.
-
-```python
-import asyncio
-
-import posthorn as horn
-from posthorn.adapters import LinkedIn, Telegram
-
-async def main():
-    app = horn.Posthorn(
-        # 1. Define where alerts should go
-        alert_carrier=Telegram(
-            bot_token="YOUR_BOT_TOKEN",
-            chat_id="YOUR_CHAT_ID",
-        ),
-        
-        # 2. Define which platforms to scrape
-        job_boards=horn.JobBoardManager([
-            LinkedIn(),
-        ]),
-        
-        # 3. Define your target campaigns
-        campaigns=horn.CampaignManager([
-            horn.Campaign(
-                name="EdgeAI-Engineer",
-                keywords=["Edge AI", "Engineer", "Rust", "Python"],
-                locations=["Remote", "Richardson, TX"]
-            ),
-            horn.Campaign(
-                name="Data-Architect",
-                keywords=["Data Architect", "Data Engineering"],
-                locations=["Remote", "Dallas, TX"]
-            ),
-        ]),
-    )
-    
-    # Fire up the daemon loop (defaults to a 15-minute sweep interval)
-    await app.run(interval_seconds=900)
-
-if __name__ == "__main__":
-    asyncio.run(main())
-
-```
-
----
-
-## 🛠 Extending Posthorn
-
-Adding a custom integration is as simple as fulfilling a Protocol. No subclassing required.
-
-### Custom Alert Carrier
-
-Just implement a `.name` property and an `async def dispatch()` method.
-
-```python
-class SlackCarrier:
-    @property
-    def name(self) -> str:
-        return "slack"
-
-    async def dispatch(self, job: JobPost, campaign: Campaign) -> None:
-        payload = {"text": f"New match for {campaign.name}: {job.title} at {job.company}\n{job.url}"}
-        async with httpx.AsyncClient() as client:
-            await client.post(SLACK_WEBHOOK_URL, json=payload)
-
-```
+If you encounter any issues, try restarting your terminal session or re-sourcing your startup file.
+* `source ~/.zshrc` for MacOS
+* `source ~/.bashrc` for Linux
 
 ---
 
