@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/drewv-labs/Posthorn/main/.github/images/icon.svg" alt="Posthorn Logo" width="220"/>
 
   <h1>Posthorn</h1>
-  <p><b>An extensible, async-first job monitoring and alerting daemon.</b></p>
+  <p><b>Find a damn job like a boss.</b></p>
 </div>
 
 <br/>
