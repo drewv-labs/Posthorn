@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 import dataclasses
 
-from posthorn.adapters.state_dbs.duckdb import DuckDB
-from posthorn.core.models.campaign_model import Campaign
-from posthorn.core.models.job_post_model import JobPost
-from posthorn.core.models.job_state_enum import JobState
+from posthorn import (
+    Campaign,
+    JobPost,
+    JobState,
+    StateMachine,
+)
 
 
-async def test_job_novelty_check(memory_db: DuckDB, sample_job: JobPost, sample_campaign: Campaign):
+async def test_job_novelty_check(memory_db: StateMachine, sample_job: JobPost, sample_campaign: Campaign):
     """Ensures is_novel correctly identifies unseen vs existing jobs."""
     # Job should be novel initially
     assert await memory_db.is_novel(sample_job.id) is True
@@ -19,7 +23,7 @@ async def test_job_novelty_check(memory_db: DuckDB, sample_job: JobPost, sample_
 
 
 async def test_idempotency_lock_prevents_duplicates(
-    memory_db: DuckDB, sample_job: JobPost, sample_campaign: Campaign
+    memory_db: StateMachine, sample_job: JobPost, sample_campaign: Campaign
 ):
     """
     Proves the core concurrency protection mechanism: the database must reject
@@ -47,7 +51,7 @@ async def test_idempotency_lock_prevents_duplicates(
 
 
 async def test_campaign_metrics_aggregation(
-    memory_db: DuckDB, sample_job: JobPost, sample_campaign: Campaign
+    memory_db: StateMachine, sample_job: JobPost, sample_campaign: Campaign
 ):
     """Verifies the reporting engine tallies states correctly."""
     # Generate three distinct jobs using dataclass replacement
@@ -72,7 +76,7 @@ async def test_campaign_metrics_aggregation(
 
 
 async def test_pending_alerts_sweep(
-    memory_db: DuckDB, sample_job: JobPost, sample_campaign: Campaign
+    memory_db: StateMachine, sample_job: JobPost, sample_campaign: Campaign
 ):
     """Ensures jobs stuck in QUEUED or FAILED can be retrieved for a retry sweep."""
     job_queued = dataclasses.replace(sample_job, id="queued_1")

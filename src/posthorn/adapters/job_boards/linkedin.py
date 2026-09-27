@@ -12,7 +12,7 @@ from ...core.models.job_post_model import JobPost
 logger = logging.getLogger(__name__)
 
 
-class LinkedIn:
+class LinkedInBoard:
     """
     LinkedIn job board adapter using the unauthenticated guest API.
     Structurally fulfills the JobBoard protocol without using Selenium or triggering ATS bans.

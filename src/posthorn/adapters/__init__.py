@@ -1,18 +1,35 @@
 from __future__ import annotations
 
-from .alert_carriers import Discord, Telegram
-from .job_boards import Indeed, LinkedIn, ZipRecruiter
-from .state_dbs import DuckDB, PostgresDB
+from .alert_carriers import (
+    DiscordCarrier,
+    TelegramCarrier,
+)
+from .job_boards import (
+    IndeedBoard,
+    LinkedInBoard,
+    ZipRecruiterBoard,
+)
+
+CARRIER_REGISTRY = {
+    "discord": DiscordCarrier,
+    # "slack": Slack,
+    "telegram": TelegramCarrier,
+}
+
+JOB_BOARD_REGISTRY = {
+    "linkedin": LinkedInBoard,
+    "indeed": IndeedBoard,
+    "ziprecruiter": ZipRecruiterBoard,
+    "zip": ZipRecruiterBoard,
+}
+
 
 __all__ = [
     # Alert Carriers
-    "Discord",
-    "Telegram",
+    "DiscordCarrier",
+    "TelegramCarrier",
     # Job Boards
-    "Indeed",
-    "LinkedIn",
-    "ZipRecruiter",
-    # State DBs
-    "DuckDB",
-    "PostgresDB",
+    "IndeedBoard",
+    "LinkedInBoard",
+    "ZipRecruiterBoard",
 ]

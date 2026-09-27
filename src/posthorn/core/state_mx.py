@@ -7,14 +7,14 @@ from typing import Any
 
 import duckdb
 
-from ...core.models.campaign_model import Campaign
-from ...core.models.job_post_model import JobPost
-from ...core.models.job_state_enum import JobState
-from ...sugar.current_local_datetime import current_local_datetime
-from ...sugar.to_datetime import to_datetime
+from ..sugar.current_local_datetime import current_local_datetime
+from ..sugar.to_datetime import to_datetime
+from .models.campaign_model import Campaign
+from .models.job_post_model import JobPost
+from .models.job_state_enum import JobState
 
 
-class DuckDB:
+class StateMachine:
     """
     DuckDB state machine and persistent ledger implementation.
 
@@ -22,8 +22,8 @@ class DuckDB:
     to guarantee safe thread handoff and keep the event loop unblocked.
     """
 
-    def __init__(self, db_path: str | Path = "posthorn.duckdb") -> None:
-        self.db_path = Path(db_path)
+    def __init__(self, db_path: str | Path | None) -> None:
+        self.db_path = Path(db_path or "posthorn.duckdb")
         self._conn: duckdb.DuckDBPyConnection | None = None
         self._lock = asyncio.Lock()
 

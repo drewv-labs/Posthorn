@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from .indeed import Indeed
-from .linkedin import LinkedIn
-from .ziprecruiter import ZipRecruiter
+from .indeed import IndeedBoard
+from .linkedin import LinkedInBoard
+from .ziprecruiter import ZipRecruiterBoard
 
 __all__ = [
-    "Indeed",
-    "LinkedIn",
-    "ZipRecruiter",
+    "IndeedBoard",
+    "LinkedInBoard",
+    "ZipRecruiterBoard",
 ]

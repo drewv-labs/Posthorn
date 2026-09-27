@@ -3,9 +3,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from posthorn.adapters.state_dbs.duckdb import DuckDB
-from posthorn.core.models.campaign_model import Campaign
-from posthorn.core.models.job_post_model import JobPost
+from posthorn.core import Campaign, JobPost, StateMachine
 
 
 class MockCarrier:
@@ -31,12 +29,12 @@ def mock_carrier() -> MockCarrier:
 
 
 @pytest.fixture
-async def memory_db() -> AsyncGenerator[DuckDB, None]:
+async def memory_db() -> AsyncGenerator[StateMachine, None]:
     """
-    Provides a fresh, isolated, in-memory DuckDB database for each test.
+    Provides a fresh, isolated, in-memory StateMachine database for each test.
     Automatically connects before the test and disconnects after.
     """
-    db = DuckDB(db_path=":memory:")
+    db = StateMachine(db_path=":memory:")
     await db.connect()
 
     yield db  # Hands control to the test function

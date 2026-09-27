@@ -8,8 +8,8 @@ from .core import (
     JobBoardManager,
     JobPost,
     JobState,
-    Posthorn,
-    StateDB,
+    PosthornDaemon,
+    StateMachine,
 )
 from .sugar import (
     current_local_datetime,
@@ -18,14 +18,14 @@ from .sugar import (
 
 __all__ = [
     "AlertCarrier",
+    "StateMachine",
     "JobBoard",
-    "StateDB",
     "CampaignManager",
     "JobBoardManager",
     "Campaign",
     "JobPost",
     "JobState",
-    "Posthorn",
+    "PosthornDaemon",
     "current_local_datetime",
     "to_datetime",
 ]

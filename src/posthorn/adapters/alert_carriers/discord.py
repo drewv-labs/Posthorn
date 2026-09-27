@@ -8,7 +8,7 @@ from ...core.models.job_post_model import JobPost
 logger = logging.getLogger(__name__)
 
 
-class Discord:
+class DiscordCarrier:
     """
     Discord webhook alert dispatcher.
     Structurally fulfills the AlertCarrier protocol.

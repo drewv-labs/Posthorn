@@ -1,14 +1,7 @@
 import dataclasses
 from collections.abc import AsyncGenerator
 
-from posthorn import (
-    Campaign,
-    CampaignManager,
-    JobBoardManager,
-    JobPost,
-    Posthorn,
-)
-from posthorn.adapters import DuckDB
+from posthorn import Campaign, CampaignManager, JobBoardManager, JobPost, PosthornDaemon
 
 
 class MockBoard:
@@ -26,7 +19,6 @@ class MockBoard:
 
 
 async def test_posthorn_end_to_end_sweep(
-    memory_db: DuckDB,
     mock_carrier,
     sample_campaign: Campaign,
     sample_job: JobPost
@@ -39,32 +31,40 @@ async def test_posthorn_end_to_end_sweep(
     fresh_job = dataclasses.replace(sample_job, id="unique_e2e_job_999")
 
     # 1. Wire up the Posthorn application with our test doubles
-    app = Posthorn(
+    app = PosthornDaemon(
         alert_carrier=mock_carrier,
         job_boards=JobBoardManager([MockBoard([fresh_job])]),
         campaigns=CampaignManager([sample_campaign]),
-        state_db=memory_db
+        statemachine_file=":memory:"  # Use in-memory DuckDB for isolated testing
     )
 
-    # 2. Execute a single sweep
-    await app.sweep()
+    # Boot the state machine (normally handled by app.run())
+    await app.state_db.connect()
 
-    # 3. Verify the job was successfully passed to the carrier
-    assert len(mock_carrier.dispatched_jobs) == 1
-    dispatched_job, dispatched_campaign = mock_carrier.dispatched_jobs[0]
+    try:
+        # 2. Execute a single sweep
+        await app.sweep()
 
-    assert dispatched_job.id == fresh_job.id
-    assert dispatched_campaign.name == sample_campaign.name
+        # 3. Verify the job was successfully passed to the carrier
+        assert len(mock_carrier.dispatched_jobs) == 1
+        dispatched_job, dispatched_campaign = mock_carrier.dispatched_jobs[0]
 
-    # 4. Verify state was updated in DuckDB
-    metrics = await memory_db.get_campaign_metrics(sample_campaign.name)
-    assert metrics["total_discovered"] == 1
-    assert metrics["novel_alerts_sent"] == 1
+        assert dispatched_job.id == fresh_job.id
+        assert dispatched_campaign.name == sample_campaign.name
 
-    # 5. Prove idempotency: running sweep again shouldn't send a second alert
-    await app.sweep()
+        # 4. Verify state was updated in DuckDB via the daemon's internal instance
+        metrics = await app.state_db.get_campaign_metrics(sample_campaign.name)
+        assert metrics["total_discovered"] == 1
+        assert metrics["novel_alerts_sent"] == 1
 
-    assert len(mock_carrier.dispatched_jobs) == 1
+        # 5. Prove idempotency: running sweep again shouldn't send a second alert
+        await app.sweep()
 
-    metrics_after = await memory_db.get_campaign_metrics(sample_campaign.name)
-    assert metrics_after["duplicates_suppressed"] == 1
+        assert len(mock_carrier.dispatched_jobs) == 1
+
+        metrics_after = await app.state_db.get_campaign_metrics(sample_campaign.name)
+        assert metrics_after["duplicates_suppressed"] == 1
+
+    finally:
+        # Ensure test isolation by dropping the connection
+        await app.state_db.disconnect()

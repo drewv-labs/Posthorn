@@ -1,25 +1,63 @@
+from __future__ import annotations
+
 import asyncio
+from typing import Any
 
-from ..adapters import DuckDB
-from .interfaces import AlertCarrier, StateDB
+from posthorn.adapters import CARRIER_REGISTRY, JOB_BOARD_REGISTRY
+
+from .interfaces import AlertCarrier
 from .managers import CampaignManager, JobBoardManager
-from .models.job_state_enum import JobState
+from .models import Campaign, JobState
+from .state_mx import StateMachine
 
 
-class Posthorn:
+class PosthornDaemon:
 
     def __init__(
         self,
         alert_carrier: AlertCarrier,
         job_boards: JobBoardManager,
         campaigns: CampaignManager,
-        state_db: StateDB | None = None
+        statemachine_file: str | None,
     ):
         """Initializes the Posthorn instance with the given alert carrier, job boards, and campaigns."""
         self.alert_carrier: AlertCarrier = alert_carrier
         self.job_boards: JobBoardManager = job_boards
         self.campaigns: CampaignManager = campaigns
-        self.state_db: StateDB = state_db or DuckDB()
+        self.state_db: StateMachine = StateMachine(statemachine_file)
+
+    @classmethod
+    def from_config(cls, config: dict[str, Any]) -> PosthornDaemon:
+        """Instantiates the daemon dynamically from a parsed TOML dictionary."""
+
+        # 1. Morph the Carrier
+        carrier_cfg = config.get("carrier", {})
+        carrier_type = carrier_cfg.pop("type", "discord") # default fallback
+
+        if carrier_type not in CARRIER_REGISTRY:
+            raise ValueError(f"Unknown carrier type: {carrier_type}")
+
+        # Instantiates DiscordCarrier(**{"webhook_url": "..."})
+        carrier = CARRIER_REGISTRY[carrier_type](**carrier_cfg)
+
+        # 2. Morph the Job Boards
+        boards_cfg = config.get("job_boards", [])
+        active_boards = []
+        for b_cfg in boards_cfg:
+            b_type = b_cfg.pop("type")
+            if b_type in JOB_BOARD_REGISTRY:
+                active_boards.append(JOB_BOARD_REGISTRY[b_type](**b_cfg))
+
+        # 3. Morph the Campaigns
+        campaigns_cfg = config.get("campaigns", [])
+        active_campaigns = [Campaign(**c) for c in campaigns_cfg]
+
+        return cls(
+            alert_carrier=carrier,
+            job_boards=JobBoardManager(active_boards),
+            campaigns=CampaignManager(active_campaigns),
+            statemachine_file=config.get("statemachine_file") or None,
+        )
 
     async def run(self, interval_seconds: int = 900) -> None:
         """

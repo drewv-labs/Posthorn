@@ -13,7 +13,7 @@ from ...core.models.job_post_model import JobPost
 logger = logging.getLogger(__name__)
 
 
-class ZipRecruiter:
+class ZipRecruiterBoard:
     """
     ZipRecruiter job board adapter using lightweight HTML parsing.
     Structurally fulfills the JobBoard protocol.
