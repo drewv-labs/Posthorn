@@ -93,7 +93,27 @@ uv sync --dev
 
 # Run the test suite
 uv run pytest -v
+```
 
+### Local Execution & State Management
+When iterating on adapters or testing the TUI locally, you can launch the daemon directly via uv:
+
+```bash
+uv run posthorn
+```
+
+If you need to wipe your local job discovery history to trigger fresh alerts for testing, Posthorn includes a built-in developer reset flag. This command safely purges the active DuckDB database and Write-Ahead Log (.wal) while preserving your config.toml parameters and rolling .bak snapshots:
+
+```bash
+uv run posthorn --dev-reset
+```
+
+### Release Process
+Posthorn uses strict, uv-native version management and GitHub Actions for automated OIDC publishing to PyPI. Before merging a feature branch to main, bump the version locally:
+
+```bash
+# Automatically increments pyproject.toml
+uv version --bump patch  # or minor, major
 ```
 
 ---
