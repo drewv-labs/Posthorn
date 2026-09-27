@@ -1,6 +1,13 @@
-# 📯 Posthorn
+<div align="center">
+  <img src=".github/images/icon.png" alt="Posthorn Logo" width="220"/>
+  
+  <h1>Posthorn</h1>
+  <p><b>An extensible, async-first job monitoring and alerting daemon.</b></p>
+</div>
 
-**An extensible, async-first job monitoring and alerting daemon.**
+<br/>
+
+## ⚡ Core Philosophy
 
 Posthorn is a lightweight, strictly-typed Python background service designed to poll job boards, filter for specific campaigns, and push early-warning alerts to webhooks or chat platforms. Built on modern Python concurrency, it relies on an embedded DuckDB state machine to enforce absolute idempotency—guaranteeing that a matched job is alerted on exactly once, even across overlapping sweeps or network failures.
 
