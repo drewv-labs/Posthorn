@@ -5,7 +5,9 @@ from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Footer, Header, Label, RichLog
 
-from .screens import SplashScreen
+from ..core import PosthornDaemon
+from .config import generate_default_config, load_config
+from .screens import SetupScreen, SplashScreen
 
 
 class PosthornApp(App):
@@ -66,11 +68,10 @@ class PosthornApp(App):
         ("s", "toggle_sweep", "Force Sweep"),
     ]
 
-    def __init__(self, daemon=None, **kwargs):
-        """Accept the configured daemon instance on boot."""
+    def __init__(self, daemon: PosthornDaemon | None = None, **kwargs):
         super().__init__(**kwargs)
         self.daemon = daemon
-        self.auto_sweep_interval = 900  # 15 minutes
+        self.auto_sweep_interval = 900
 
     async def on_ready(self) -> None:
         """Fires when the UI is fully loaded."""
@@ -78,11 +79,9 @@ class PosthornApp(App):
         log.write("[bold #3498db]📯 Posthorn Orchestrator v1.0[/]")
         log.write("[#888888]System initialized. Awaiting next sweep cycle...[/]")
 
-        # Initial metrics pull (in case DuckDB already has history)
         if self.daemon:
-            await self.update_metrics()
-            # Start the continuous background polling loop
-            self.set_interval(self.auto_sweep_interval, self.action_toggle_sweep)
+            # MOVED the initialization here where the DOM is guaranteed ready
+            self.run_worker(self.initialize_metrics_and_loop())
 
     @work(exclusive=True)
     async def action_toggle_sweep(self) -> None:
@@ -130,7 +129,42 @@ class PosthornApp(App):
         self.query_one("#stat-dupes", Label).update(str(total_supp))
 
     def on_mount(self) -> None:
+        """Route to setup wizard if no config exists, otherwise boot normally."""
+        if not self.daemon:
+            self.push_screen(SetupScreen(), self.handle_setup_complete)
+        else:
+            self.push_screen(SplashScreen())
+
+    def handle_setup_complete(self, setup_data: tuple[str, str] | None) -> None:
+        """Fires when SetupScreen is dismissed with data."""
+        if not setup_data:
+            self.exit() # User quit the setup wizard
+            return
+
+        webhook_url, job_title = setup_data
+
+        # 1. Write the TOML file
+        generate_default_config(webhook_url, job_title)
+
+        # 2. Reload and build the daemon dynamically
+        raw_config = load_config()
+        if raw_config is None:
+            raise RuntimeError(
+                "Failed to load config immediately after generation. "
+                "Check disk permissions for ~/.posthorn/"
+            )
+        self.daemon = PosthornDaemon.from_config(raw_config)
+
+        # 3. Transition to the splash screen and start the engine
         self.push_screen(SplashScreen())
+        self.run_worker(self.initialize_metrics_and_loop())
+
+    async def initialize_metrics_and_loop(self) -> None:
+        """Connects DuckDB and starts the background loop."""
+        if self.daemon:
+            await self.daemon.state_db.connect()
+            await self.update_metrics()
+            self.set_interval(self.auto_sweep_interval, self.action_toggle_sweep)
 
     def compose(self) -> ComposeResult:
         """Lays out the main dashboard."""

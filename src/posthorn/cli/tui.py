@@ -1,20 +1,15 @@
 from __future__ import annotations
 
-import tomllib
-from pathlib import Path
-
 from ..core import PosthornDaemon
 from .app import PosthornApp
+from .config import load_config
 
 
 def load_daemon_from_disk():
-    config_path = Path.home() / ".posthorn" / "config.toml"
+    raw_config = load_config()
 
-    if not config_path.exists():
-        return None # Triggers the TUI Setup Wizard we discussed
-
-    with open(config_path, "rb") as f:
-        raw_config = tomllib.load(f)
+    if not raw_config:
+        return None # Triggers the TUI Setup Wizard
 
     return PosthornDaemon.from_config(raw_config)
 
