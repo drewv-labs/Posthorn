@@ -13,8 +13,6 @@ def load_config() -> dict[str, Any] | None:
 
 def generate_default_config(webhook_url: str, job_title: str) -> None:
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-
-    # Use .as_posix() to prevent Windows backslash escaping in the TOML string
     db_path = (CONFIG_DIR / 'posthorn.duckdb').as_posix()
 
     toml_content = f"""[daemon]
@@ -26,7 +24,10 @@ type = "discord"
 webhook_url = "{webhook_url}"
 
 [[job_boards]]
-type = "mock_board"
+type = "linkedin"
+
+[[job_boards]]
+type = "ziprecruiter"
 
 [[campaigns]]
 name = "Primary Search"
