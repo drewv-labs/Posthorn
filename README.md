@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/drewv-labs/Posthorn/main/.github/images/icon.png" alt="Posthorn Logo" width="220"/>
+  <img src="https://raw.githubusercontent.com/drewv-labs/Posthorn/main/.github/images/icon.svg" alt="Posthorn Logo" width="220"/>
 
   <h1>Posthorn</h1>
   <p><b>An extensible, async-first job monitoring and alerting daemon.</b></p>
