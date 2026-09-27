@@ -45,11 +45,41 @@ We recommend installing Posthorn globally as a standalone tool using Astral's `u
 uv tool install posthorn
 ```
 
-**Start the app** using `posthorn` command. 
+### Launch & Zero-Friction Setup
+Simply launch the orchestrator from your terminal:
 
-If you encounter any issues, try restarting your terminal session or re-sourcing your startup file.
-* `source ~/.zshrc` for MacOS
-* `source ~/.bashrc` for Linux
+```Bash
+posthorn
+```
+
+If this is your first time booting the daemon, Posthorn will automatically intercept the boot sequence and launch a terminal UI wizard to capture your webhook/bot credentials and initial target job title. It will then generate your configuration, instantiate the adapters, and immediately start the background sweep.
+
+### Example Configuration: The "Telelink" Setup
+Configurations are securely stored in ~/.posthorn/config.toml. To replicate a daemon that sweeps LinkedIn and sends alerts via Telegram for multiple data and edge computing campaigns, your configuration file would look like this:
+
+```Ini, TOML
+[daemon]
+sweep_interval_minutes = 15
+statemachine_file = "~/.posthorn/posthorn.duckdb"
+
+[carrier]
+type = "telegram"
+bot_token = "YOUR_BOT_TOKEN"
+chat_id = "YOUR_CHAT_ID"
+
+[[job_boards]]
+type = "linkedin"
+
+[[campaigns]]
+name = "EdgeAI-Engineer"
+keywords = ["Edge AI", "Engineer", "Rust", "Python"]
+locations = ["Remote", "Richardson, TX"]
+
+[[campaigns]]
+name = "Data-Architect"
+keywords = ["Data Architect", "Data Engineering"]
+locations = ["Remote", "Dallas, TX"]
+```
 
 ---
 
