@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 # ──────────────────────────────────────────────────────────────────────────────
 [project]
 name = "posthorn"
-version = "0.1.4"
+version = "0.1.5"
 description = "Lightweight configurable job posting scanner and alerting. Work smarter, not harder"
 readme = "README.md"
 authors = [
@@ -28,6 +28,7 @@ requires-python = ">=3.11"
 # ── Runtime Dependencies ──────────────────────────────────────────────────────
 dependencies = [
     "beautifulsoup4>=4.15.0",
+    "duckdb>=0.10.0",
     "httpx>=0.28.1",
     "pytz>=2026.4",
     "textual>=8.2.8",
@@ -51,13 +52,6 @@ dev = [
     "build>=1.6.0",
     "twine>=7.0.0",
     "ipython>=9.17.0",
-]
-duckdb = [
-    "duckdb>=0.10.0",
-]
-postgresql = [
-    "psycopg2-binary>=2.9.0",
-    "asyncpg>=0.31.0",
 ]
 
 # ──────────────────────────────────────────────────────────────────────────────
