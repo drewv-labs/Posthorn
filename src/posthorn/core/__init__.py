@@ -1,23 +1,20 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .interfaces import (
-        AlertCarrier,
-        JobBoard,
-        StateDB,
-    )
-    from .managers import (
-        CampaignManager,
-        JobBoardManager,
-    )
-    from .models import (
-        Campaign,
-        JobPost,
-        JobState,
-    )
-    from .posthorn import Posthorn
+from .interfaces import (
+    AlertCarrier,
+    JobBoard,
+    StateDB,
+)
+from .managers import (
+    CampaignManager,
+    JobBoardManager,
+)
+from .models import (
+    Campaign,
+    JobPost,
+    JobState,
+)
+from .posthorn import Posthorn
 
 __all__ = [
     "AlertCarrier",

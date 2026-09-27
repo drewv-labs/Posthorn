@@ -29,6 +29,7 @@ requires-python = ">=3.11"
 dependencies = [
     "beautifulsoup4>=4.15.0",
     "httpx>=0.28.1",
+    "pytz>=2026.4",
 ]
 
 # ── Optional / Extra Dependencies ─────────────────────────────────────────────
@@ -72,6 +73,8 @@ exclude = ["tests*"]
 # Pytest Configuration
 # ──────────────────────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
@@ -152,6 +155,11 @@ fail_under = 0  # bump as tests mature (e.g. 80)
 
 [tool.coverage.html]
 directory = "htmlcov"
+
+[dependency-groups]
+dev = [
+    "pytest-asyncio>=1.4.0",
+]
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Virtual Environment — use uv's lockfile
