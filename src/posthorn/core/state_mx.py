@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import shutil
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
@@ -39,27 +40,40 @@ class StateMachine:
             await asyncio.to_thread(self._sync_connect)
 
     def _sync_connect(self) -> None:
-        self._conn = duckdb.connect(str(self.db_path))
-        self._conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS jobs (
-                id VARCHAR PRIMARY KEY,
-                title VARCHAR NOT NULL,
-                company VARCHAR NOT NULL,
-                url VARCHAR NOT NULL,
-                board VARCHAR NOT NULL,
-                published_at TIMESTAMPTZ,
-                state VARCHAR NOT NULL,
-                campaign_name VARCHAR NOT NULL,
-                error_msg VARCHAR,
-                discovered_at TIMESTAMPTZ NOT NULL,
-                updated_at TIMESTAMPTZ NOT NULL
-            );
+            # 1. Execute the rolling backup (skip if in-memory test DB)
+            if self.db_path.exists() and str(self.db_path) != ":memory:":
+                # Cascade older backups: .bak2 -> .bak3, .bak1 -> .bak2
+                for i in range(2, 0, -1):
+                    old_bak = self.db_path.with_name(f"{self.db_path.name}.bak{i}")
+                    new_bak = self.db_path.with_name(f"{self.db_path.name}.bak{i+1}")
+                    if old_bak.exists():
+                        shutil.copy2(old_bak, new_bak)
 
-            CREATE INDEX IF NOT EXISTS idx_jobs_state ON jobs(state);
-            CREATE INDEX IF NOT EXISTS idx_jobs_campaign ON jobs(campaign_name);
-            """
-        )
+                # Snapshot the current state to .bak1
+                shutil.copy2(self.db_path, self.db_path.with_name(f"{self.db_path.name}.bak1"))
+
+            # 2. Proceed with normal DuckDB connection and setup
+            self._conn = duckdb.connect(str(self.db_path))
+            self._conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS jobs (
+                    id VARCHAR PRIMARY KEY,
+                    title VARCHAR NOT NULL,
+                    company VARCHAR NOT NULL,
+                    url VARCHAR NOT NULL,
+                    board VARCHAR NOT NULL,
+                    published_at TIMESTAMPTZ,
+                    state VARCHAR NOT NULL,
+                    campaign_name VARCHAR NOT NULL,
+                    error_msg VARCHAR,
+                    discovered_at TIMESTAMPTZ NOT NULL,
+                    updated_at TIMESTAMPTZ NOT NULL
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_jobs_state ON jobs(state);
+                CREATE INDEX IF NOT EXISTS idx_jobs_campaign ON jobs(campaign_name);
+                """
+            )
 
     async def disconnect(self) -> None:
         async with self._lock:

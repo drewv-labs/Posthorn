@@ -2,12 +2,29 @@ from __future__ import annotations
 
 from textual import work
 from textual.app import App, ComposeResult
-from textual.containers import Horizontal, Vertical
+from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.widgets import Footer, Header, Label, RichLog
 
 from ..core import PosthornDaemon
 from .config import generate_default_config, load_config
-from .screens import SetupScreen, SplashScreen
+from .screens import CampaignScreen, SetupScreen, SplashScreen
+
+
+class CampaignStatBlock(Vertical):
+    """A dynamically mounted widget for individual campaign metrics."""
+
+    def __init__(self, name: str, discovered: int, sent: int, dupes: int, **kwargs):
+        super().__init__(**kwargs)
+        self.campaign_name = name
+        self.discovered = discovered
+        self.sent = sent
+        self.dupes = dupes
+
+    def compose(self) -> ComposeResult:
+        yield Label(f"🎯 {self.campaign_name}", classes="campaign-name")
+        yield Label(f"Discovered: {self.discovered}", classes="stat-item")
+        yield Label(f"Alerts Sent: {self.sent}", classes="stat-item")
+        yield Label(f"Duplicates: {self.dupes}", classes="stat-item")
 
 
 class PosthornApp(App):
@@ -49,13 +66,30 @@ class PosthornApp(App):
     /* Left Panel Metrics */
     #stats-panel { column-span: 1; }
 
-    .stat-label {
+    #metrics-container {
+        height: 1fr;
+        overflow-y: auto;
+        scrollbar-size: 1 1;
+    }
+
+    CampaignStatBlock {
+        height: auto;
+        margin-bottom: 1;
+        padding-bottom: 1;
+        border-bottom: dashed #444444;
+    }
+
+    CampaignStatBlock:last-of-type {
+        border-bottom: none;
+    }
+
+    .campaign-name {
         color: #3498db; /* Posthorn Blue */
         text-style: bold;
     }
     .stat-value {
         color: #f1c40f; /* Duck Yellow */
-        margin-bottom: 1;
+        margin-bottom: 3; /* Increased from 1 to push the CAMPAIGN METRICS section down */
     }
 
     /* Right Panel Log */
@@ -66,6 +100,7 @@ class PosthornApp(App):
     BINDINGS = [
         ("q", "quit", "Quit Daemon"),
         ("s", "toggle_sweep", "Force Sweep"),
+        ("c", "manage_campaigns", "Manage Campaigns"), # New hotkey
     ]
 
     def __init__(self, daemon: PosthornDaemon | None = None, **kwargs):
@@ -109,24 +144,60 @@ class PosthornApp(App):
         finally:
             status.update("IDLING")
 
+    def action_manage_campaigns(self) -> None:
+            """Pops the campaign manager screen."""
+            self.push_screen(CampaignScreen(), self.handle_campaigns_closed)
+
+    async def handle_campaigns_closed(self, config_changed: bool | None) -> None:
+        """Fires when the CampaignScreen is dismissed."""
+        if config_changed:
+            log = self.query_one("#event-log", RichLog)
+            log.write("[bold #f1c40f]Reloading daemon configuration...[/]")
+
+            # 1. Safely close the old DuckDB connection to release the file lock
+            if self.daemon:
+                await self.daemon.state_db.disconnect()
+
+            # 2. Hot-swap the engine
+            raw_config = load_config()
+            if raw_config is None:
+                raise RuntimeError(
+                    "Failed to load config after CampaignScreen closed. "
+                    "Check disk permissions for ~/.posthorn/"
+                )
+            self.daemon = PosthornDaemon.from_config(raw_config)
+
+            # 3. Boot the new state machine connection BEFORE querying metrics
+            await self.daemon.state_db.connect()
+
+            # 4. Repopulate the DuckDB side-panel metrics
+            await self.update_metrics()
+
+            log.write("[bold #2ecc71]Daemon hot-swapped successfully.[/]")
+
     async def update_metrics(self) -> None:
-        """Pulls aggregated metrics from DuckDB and updates the side panel."""
+        """Pulls metrics from DuckDB and rebuilds the side panel."""
         if not self.daemon or not self.daemon.campaigns:
             return
 
-        total_disc = total_sent = total_supp = 0
+        container = self.query_one("#metrics-container", VerticalScroll)
 
-        # Aggregate metrics across all configured campaigns
-        for campaign in self.daemon.campaigns:
-            metrics = await self.daemon.state_db.get_campaign_metrics(campaign.name)
-            total_disc += metrics.get("total_discovered", 0)
-            total_sent += metrics.get("novel_alerts_sent", 0)
-            total_supp += metrics.get("duplicates_suppressed", 0)
+        # Suspend updates to the DOM to prevent visual flickering
+        with container.app.batch_update():
+            # Wipe the old metric blocks
+            await container.query("*").remove()
 
-        # Push to the UI widgets
-        self.query_one("#stat-discovered", Label).update(str(total_disc))
-        self.query_one("#stat-sent", Label).update(str(total_sent))
-        self.query_one("#stat-dupes", Label).update(str(total_supp))
+            # Query DuckDB and mount fresh blocks for every campaign
+            for campaign in self.daemon.campaigns:
+                metrics = await self.daemon.state_db.get_campaign_metrics(campaign.name)
+
+                disc = metrics.get("total_discovered", 0)
+                sent = metrics.get("novel_alerts_sent", 0)
+                supp = metrics.get("duplicates_suppressed", 0)
+
+                await container.mount(
+                    CampaignStatBlock(campaign.name, disc, sent, supp)
+                    )
 
     def on_mount(self) -> None:
         """Route to setup wizard if no config exists, otherwise boot normally."""
@@ -171,25 +242,18 @@ class PosthornApp(App):
         yield Header(show_clock=True)
 
         with Horizontal(id="dashboard-grid"):
-            # Left Column: State & Metrics
+            # Left Column: State & Dynamic Metrics
             with Vertical(id="stats-panel", classes="panel"):
                 yield Label("DAEMON STATE", classes="panel-title")
                 yield Label("IDLING", id="status-indicator", classes="stat-value")
 
                 yield Label("CAMPAIGN METRICS", classes="panel-title")
-                yield Label("Discovered Jobs", classes="stat-label")
-                yield Label("0", id="stat-discovered", classes="stat-value")
-
-                yield Label("Alerts Sent", classes="stat-label")
-                yield Label("0", id="stat-sent", classes="stat-value")
-
-                yield Label("Duplicates Suppressed", classes="stat-label")
-                yield Label("0", id="stat-dupes", classes="stat-value")
+                # This container will dynamically hold the CampaignStatBlocks
+                yield VerticalScroll(id="metrics-container")
 
             # Right Column: Live Event Log
             with Vertical(id="log-panel", classes="panel"):
                 yield Label("LIVE EVENT STREAM", classes="panel-title")
-                # RichLog automatically handles scrolling and text formatting
                 yield RichLog(id="event-log", highlight=True, markup=True)
 
         yield Footer()
