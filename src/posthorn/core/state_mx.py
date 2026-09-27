@@ -23,7 +23,14 @@ class StateMachine:
     """
 
     def __init__(self, db_path: str | Path | None) -> None:
-        self.db_path = Path(db_path or "posthorn.duckdb")
+        if db_path is None:
+            # Centralize the fallback database in ~/.posthorn
+            default_dir = Path.home() / ".posthorn"
+            default_dir.mkdir(parents=True, exist_ok=True)
+            self.db_path = default_dir / "posthorn.duckdb"
+        else:
+            self.db_path = Path(db_path)
+
         self._conn: duckdb.DuckDBPyConnection | None = None
         self._lock = asyncio.Lock()
 
