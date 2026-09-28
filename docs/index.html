@@ -52,6 +52,24 @@
     section {
         margin-bottom: 3rem;
     }
+
+    /* Screenshot Gallery Styles */
+    .demo-gallery {
+        margin-top: 2rem;
+        gap: 2rem;
+    }
+    .demo-gallery img {
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        border: 1px solid #333; /* Subtle border to separate dark images from dark background */
+        width: 100%;
+    }
+    .demo-gallery figcaption {
+        text-align: center;
+        margin-top: 0.75rem;
+        color: var(--pico-muted-color);
+        font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -70,9 +88,22 @@
         </div>
     </section>
 
+    <!-- About Section -->
     <section id="about">
         <h2>What is it?</h2>
         <p>Posthorn is a lightweight, TUI supported background service designed to poll job boards, filter for specific campaigns, and push early-warning alerts to webhooks or chat platforms. Built on modern Python concurrency, it relies on an embedded DuckDB state machine to enforce absolute idempotency—guaranteeing that a matched job is alerted on exactly once, even across overlapping sweeps or network failures.</p>
+
+        <!-- App Screenshots Gallery -->
+        <div class="grid demo-gallery">
+            <figure>
+                <img src="posthorn-tui-app-demo.png" alt="Posthorn Terminal UI Dashboard">
+                <figcaption>Terminal-Native Campaign Manager</figcaption>
+            </figure>
+            <figure>
+                <img src="posthorn-discord-alerting-demo.png" alt="Discord Job Alert Integration">
+                <figcaption>Real-time Discord Webhook Alerts</figcaption>
+            </figure>
+        </div>
     </section>
 
     <!-- Installation & Setup -->
@@ -88,7 +119,37 @@
       <pre><code>posthorn</code></pre>
       <p>If this is your first time running the app, Posthorn will automatically launch a secure setup wizard. It will ask for your <strong>Discord Webhook URL</strong> (or Telegram credentials) and your initial target job title. Once saved, the daemon will instantly begin sweeping the boards and delivering matches to your phone.</p>
     </section>
+    <hr>
 
+    <!-- Discord Setup -->
+    <section id="discord-setup">
+        <h2>Setting up Discord Alerts</h2>
+        <p>Posthorn uses Webhooks to instantly push job matches directly to your phone or desktop. Here is how to configure a private Discord server in under two minutes.</p>
+
+        <div class="grid">
+        <div>
+            <h3>1. Get Discord</h3>
+            <p>If you don't already have it, download and install <a href="https://discord.com/download" target="_blank">Discord</a>, and create a free account.</p>
+
+            <h3>2. Create a Private Server</h3>
+            <p>Click the green <strong>+</strong> icon on the far left sidebar to <em>Add a Server</em>. Select <strong>Create My Own</strong>, then <strong>For me and my friends</strong>. Name it something like "Job Alerts" and click Create.</p>
+        </div>
+
+        <div>
+            <h3>3. Create a Dedicated Channel</h3>
+            <p>Click the <strong>+</strong> next to Text Channels to create a new channel named <code>#posthorn</code>. <br><em>Optimal Setting:</em> Right-click the new channel, select <strong>Notification Settings</strong>, and change it to <strong>All Messages</strong> so your phone actually rings when a job drops.</p>
+
+            <h3>4. Generate the Webhook URL</h3>
+            <p>Right-click your <code>#posthorn</code> channel and select <strong>Edit Channel</strong>. Navigate to <strong>Integrations</strong> > <strong>Webhooks</strong> > <strong>New Webhook</strong>. Name the bot "Posthorn", click <strong>Copy Webhook URL</strong>, and hit Save.</p>
+        </div>
+        </div>
+
+        <!-- Setup Wizard Screenshot -->
+        <figure class="demo-gallery" style="max-width: 650px; margin: 2rem auto 0 auto;">
+            <img src="posthorn-setup-wizard.png" alt="Posthorn Setup Wizard">
+            <figcaption>Paste your Discord Webhook URL into the Posthorn setup wizard.</figcaption>
+        </figure>
+    </section>
     <hr>
 
     <!-- Operator's Manual -->
