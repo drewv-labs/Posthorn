@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 # ──────────────────────────────────────────────────────────────────────────────
 [project]
 name = "posthorn"
-version = "0.2.8"
+version = "0.2.9"
 description = "Lightweight configurable job posting scanner and alerting. Work smarter, not harder"
 readme = "README.md"
 authors = [
@@ -77,6 +77,7 @@ exclude = ["tests*"]
 
 [tool.setuptools.package-data]
 "posthorn" = ["**/*.json", "**/*.yaml", "**/*.yml", "**/*.toml"]
+"*" = ["*.ans"]
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Pytest Configuration
