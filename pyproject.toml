@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 # ──────────────────────────────────────────────────────────────────────────────
 [project]
 name = "posthorn"
-version = "0.2.4"
+version = "0.2.5"
 description = "Lightweight configurable job posting scanner and alerting. Work smarter, not harder"
 readme = "README.md"
 authors = [
@@ -58,7 +58,8 @@ dev = [
 # Project URLs
 # ──────────────────────────────────────────────────────────────────────────────
 [project.urls]
-homepage = "https://github.com/drewv-labs/Posthorn"
+homepage = "https://duckjobs.dev/"
+github = "https://github.com/drewv-labs/Posthorn"
 
 # ──────────────────────────────────────────────────────────────────────────────
 # TUI Configuration
