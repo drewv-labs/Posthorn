@@ -30,19 +30,34 @@
     .step-card {
       margin-bottom: 2rem;
     }
+    /* Adds space above every h2 except the first one in a container */
+    h2 {
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Adds space below each section */
+    section {
+        margin-bottom: 3rem;
+    }
   </style>
 </head>
 <body>
   <main class="container">
 
     <!-- Hero Section -->
-        <section class="hero">
+    <section class="hero">
         <img src="icon_transparent.svg" alt="Posthorn Logo" class="hero-logo">
         <h1>Posthorn</h1>
         <p>Find a damn job like a boss!</p>
         <a href="#setup" role="button">Get Started</a>
         <a href="https://github.com/drewv-labs/Posthorn" role="button" class="secondary outline">View on GitHub</a>
-        </section>
+    </section>
+
+    <section id="about">
+        <h2>What is it?</h2>
+        <p>Posthorn is a lightweight, TUI supported background service designed to poll job boards, filter for specific campaigns, and push early-warning alerts to webhooks or chat platforms. Built on modern Python concurrency, it relies on an embedded DuckDB state machine to enforce absolute idempotency—guaranteeing that a matched job is alerted on exactly once, even across overlapping sweeps or network failures.</p>
+    </section>
 
     <!-- Installation & Setup -->
     <section id="setup">
