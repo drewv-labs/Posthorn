@@ -36,15 +36,18 @@
   <main class="container">
 
     <!-- Hero Section -->
-    <section class="hero">
-      <h1>📯 Posthorn</h1>
-      <p>A frictionless, terminal-native job board alerting daemon.</p>
-      <a href="#setup" role="button">Get Started</a>
-      <a href="https://github.com/drewv-labs/Posthorn" role="button" class="secondary outline">View on GitHub</a>
-    </section>
+        <section class="hero">
+        <img src="icon_transparent.svg" alt="Posthorn Logo" class="hero-logo">
+        <h1>Posthorn</h1>
+        <p>Find a damn job like a boss!</p>
+        <a href="#setup" role="button">Get Started</a>
+        <a href="https://github.com/drewv-labs/Posthorn" role="button" class="secondary outline">View on GitHub</a>
+        </section>
 
     <!-- Installation & Setup -->
     <section id="setup">
+      <h2>0. Install Astral uv Python Manager</h2>
+      <pre><code>curl -LsSf https://astral.sh/uv/install.sh | sh</code></pre>
       <h2>1. Installation</h2>
       <p>Posthorn runs on Windows, macOS, and Linux. We recommend installing it as a standalone tool using Astral's <code>uv</code>:</p>
       <pre><code>uv tool install posthorn</code></pre>
