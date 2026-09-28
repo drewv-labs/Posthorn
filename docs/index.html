@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Posthorn | Automated Job Alerting Daemon</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <style>
+    /* Posthorn Custom Theme Accents */
+    :root {
+      --pico-primary: #3498db;
+      --pico-primary-hover: #2980b9;
+    }
+    .hero {
+      text-align: center;
+      padding: 4rem 0 2rem 0;
+    }
+    .hero h1 {
+      color: #f1c40f; /* Duck Yellow */
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--pico-muted-color);
+    }
+    code {
+      font-size: 1.1rem;
+    }
+    .step-card {
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <h1>📯 Posthorn</h1>
+      <p>A frictionless, terminal-native job board alerting daemon.</p>
+      <a href="#setup" role="button">Get Started</a>
+      <a href="https://github.com/drewv-labs/Posthorn" role="button" class="secondary outline">View on GitHub</a>
+    </section>
+
+    <!-- Installation & Setup -->
+    <section id="setup">
+      <h2>1. Installation</h2>
+      <p>Posthorn runs on Windows, macOS, and Linux. We recommend installing it as a standalone tool using Astral's <code>uv</code>:</p>
+      <pre><code>uv tool install posthorn</code></pre>
+
+      <h2 style="margin-top: 2rem;">2. First-Time Setup</h2>
+      <p>You do not need to write any code to use Posthorn. Simply launch the app from your terminal:</p>
+      <pre><code>posthorn</code></pre>
+      <p>If this is your first time running the app, Posthorn will automatically launch a secure setup wizard. It will ask for your <strong>Discord Webhook URL</strong> (or Telegram credentials) and your initial target job title. Once saved, the daemon will instantly begin sweeping the boards and delivering matches to your phone.</p>
+    </section>
+
+    <hr>
+
+    <!-- Operator's Manual -->
+    <section id="manual">
+      <h2>Operator's Manual</h2>
+      <p>Once the dashboard is running, you can manage the daemon using the following hotkeys:</p>
+      <div class="grid">
+        <article class="step-card">
+          <header><strong>Manage Campaigns</strong> ( <code>c</code> )</header>
+          Pause the daemon and open the Campaign Manager. Add or remove job targets on the fly. When you exit, the daemon hot-swaps your new configuration without missing a beat.
+        </article>
+        <article class="step-card">
+          <header><strong>Force Sweep</strong> ( <code>s</code> )</header>
+          Bypass the 15-minute resting interval and force the daemon to immediately sweep all connected job boards.
+        </article>
+      </div>
+
+      <h3>Maintenance</h3>
+      <p>If you ever want to wipe your job discovery history and start fresh without losing your configuration, stop the app (<code>q</code>) and run the developer reset command:</p>
+      <pre><code>posthorn --dev-reset</code></pre>
+    </section>
+
+  </main>
+</body>
+</html>
