@@ -15,13 +15,25 @@
       text-align: center;
       padding: 4rem 0 2rem 0;
     }
+    .hero-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem; /* Space between logo and text */
+        margin-bottom: 0.5rem;
+    }
+    .hero-logo {
+        height: 200px; /* Scaled down to match text height */
+        width: auto;
+    }
     .hero h1 {
-      color: #f1c40f; /* Duck Yellow */
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
+        color: #f1c40f; /* Duck Yellow */
+        font-size: 6rem; /* Slightly larger to match the inline aesthetic */
+        margin: 0; /* Remove default margin since the flexbox handles layout */
+        line-height: 1;
     }
     .hero p {
-      font-size: 1.25rem;
+      font-size: 2.5rem;
       color: var(--pico-muted-color);
     }
     code {
@@ -47,11 +59,15 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <img src="icon_transparent.svg" alt="Posthorn Logo" class="hero-logo">
-        <h1>Posthorn</h1>
+        <div class="hero-header">
+            <img src="icon_transparent.svg" alt="Posthorn Logo" class="hero-logo">
+            <h1>Posthorn</h1>
+        </div>
         <p>Find a damn job like a boss!</p>
-        <a href="#setup" role="button">Get Started</a>
-        <a href="https://github.com/drewv-labs/Posthorn" role="button" class="secondary outline">View on GitHub</a>
+        <div style="margin-top: 2rem;">
+            <a href="#setup" role="button">Get Started</a>
+            <a href="https://github.com/drewv-labs/Posthorn" role="button" class="secondary outline">View on GitHub</a>
+        </div>
     </section>
 
     <section id="about">
