@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from .daemon import PosthornDaemon
 from .interfaces import (
+    AiProvider,
     AlertCarrier,
     JobBoard,
 )
@@ -13,6 +14,7 @@ from .models import (
     Campaign,
     JobPost,
     JobState,
+    ScreeningDecision,
 )
 from .state_mx import StateMachine
 
@@ -26,4 +28,6 @@ __all__ = [
     "JobPost",
     "JobState",
     "PosthornDaemon",
+    "AiProvider",
+    "ScreeningDecision",
 ]

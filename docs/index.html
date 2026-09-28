@@ -91,8 +91,8 @@
     <!-- About Section -->
     <section id="about">
         <h2>What is it?</h2>
-        <p>Posthorn is a lightweight, TUI supported background service designed to poll job boards, filter for specific campaigns, and push early-warning alerts to webhooks or chat platforms. Built on modern Python concurrency, it relies on an embedded DuckDB state machine to enforce absolute idempotency—guaranteeing that a matched job is alerted on exactly once, even across overlapping sweeps or network failures.</p>
-
+        <p>Posthorn is an asyncronous background service designed to scan job boards, filter for specific keyword campaigns, and push early-warning alerts to Discord (more options on the way). Stop wasting time scrolling job postings only to be the 300th applicant... get alerted, be first, get that damn job! Built ontop of a lightweight local DuckDB state machine, Posthorn guarantees that a matched job is alerted on exactly once, even across overlapping sweeps or network failures.</p>
+        <p>Posthorn provides a Terminal User Interface (TUI) to manage the daemon and configure keyword campaigns on the fly.</p>
         <!-- App Screenshots Gallery -->
         <div class="grid demo-gallery">
             <figure>
@@ -108,17 +108,39 @@
 
     <!-- Installation & Setup -->
     <section id="setup">
-      <h2>0. Install Astral uv Python Manager</h2>
-      <pre><code>curl -LsSf https://astral.sh/uv/install.sh | sh</code></pre>
-      <h2>1. Installation</h2>
-      <p>Posthorn runs on Windows, macOS, and Linux. We recommend installing it as a standalone tool using Astral's <code>uv</code>:</p>
-      <pre><code>uv tool install posthorn</code></pre>
+        <h2>How to install this glorious app?</h2>
+        <p>
+        Run the setup command inside your system's terminal for your computer's OS (MacOS, Windows, Linux). Copy and paste the command, then press <kbd>Enter</kbd>.
+        </p>
 
-      <h2 style="margin-top: 2rem;">2. First-Time Setup</h2>
-      <p>You do not need to write any code to use Posthorn. Simply launch the app from your terminal:</p>
-      <pre><code>posthorn</code></pre>
-      <p>If this is your first time running the app, Posthorn will automatically launch a secure setup wizard. It will ask for your <strong>Discord Webhook URL</strong> (or Telegram credentials) and your initial target job title. Once saved, the daemon will instantly begin sweeping the boards and delivering matches to your phone.</p>
+        <!-- Terminal Guidance Cards -->
+        <div class="grid" style="margin: 1.5rem 0 2rem 0;">
+        <article style="padding: 1rem 1.25rem; margin-bottom: 0;">
+            <strong>macOS / Linux</strong><br>
+            <small class="pico-color-muted">Open <strong>Terminal.app</strong></small>
+        </article>
+        <article style="padding: 1rem 1.25rem; margin-bottom: 0;">
+            <strong>Windows</strong><br>
+            <small class="pico-color-muted">Open <strong>PowerShell</strong> (search in Start menu)</small>
+        </article>
+        </div>
+
+        <h3>1. Install Posthorn Daemon & TUI Manager</h3>
+        <p><strong>macOS & Linux:</strong></p>
+        <pre><code>curl -LsSf https://duckjobs.dev/install.sh | sh</code></pre>
+
+        <p><strong>Windows (PowerShell):</strong></p>
+        <pre><code>powershell -ExecutionPolicy ByPass -c "irm https://duckjobs.dev/install.ps1 | iex"</code></pre>
+
+        <h3>2. First-Time Setup</h3>
+        <p>Launch the app directly from your terminal:</p>
+        <pre><code>posthorn</code></pre>
+        <p>
+        On first launch, Posthorn opens a secure setup wizard in your terminal. Enter your <strong>Discord Webhook URL</strong> and your initial target job title. Once saved, the daemon immediately starts sweeping job boards and routing matches to your notification channel.
+        </p>
+        <p>If you receive an error that "Posthorn is not found", or something like, try restarting your Terminal/Powershell app and rerun step 2.</p>
     </section>
+
     <hr>
 
     <!-- Discord Setup -->
@@ -174,4 +196,17 @@
 
   </main>
 </body>
+
+<footer class="container" style="margin-top: 4rem; padding-bottom: 4rem; text-align: center;">
+      <p style="color: var(--pico-muted-color); font-size: 1.1rem; margin-bottom: 1rem;">Made with ♥️ by</p>
+
+      <pre style="display: inline-block; text-align: left; padding: 1.5rem; border-radius: 8px; border: 1px solid #333; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);"><code>DREW-V := {
+  "Simplicity in the Architecture",
+  "Efficiency in the Engineering",
+  "Purity in the Science",
+  "Audacity in the Art",
+  "Life in the Logic"
+}</code></pre>
+</footer>
+
 </html>
