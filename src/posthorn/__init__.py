@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from .core import (
+    AiProvider,
     AlertCarrier,
     Campaign,
     CampaignManager,
@@ -9,6 +10,7 @@ from .core import (
     JobPost,
     JobState,
     PosthornDaemon,
+    ScreeningDecision,
     StateMachine,
 )
 from .sugar import (
@@ -28,4 +30,6 @@ __all__ = [
     "PosthornDaemon",
     "current_local_datetime",
     "to_datetime",
+    "AiProvider",
+    "ScreeningDecision",
 ]
