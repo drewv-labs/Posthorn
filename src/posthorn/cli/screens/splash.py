@@ -21,7 +21,7 @@ class SplashScreen(Screen):
                 # Translates the terminal codes to Textual colors natively
                 ansi_art = Text.from_ansi(f.read())
         else:
-            ansi_art = "[ icon.ans not found in cli directory ]"
+            ansi_art = "[ icon_dark_transparent.ans not found in cli directory ]"
 
         with Middle(), Center():
                 yield Static(ansi_art, id="splash-icon")
